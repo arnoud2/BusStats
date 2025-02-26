@@ -3,6 +3,7 @@ package cui;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import domein.Buyer;
 import domein.DomeinController;
 
 public class BusSimApplication {
@@ -26,9 +27,9 @@ public class BusSimApplication {
                 
                 switch (option) {
                     case 1 -> dm.showData();
-                    case 2 -> dm.addBuyer();
+                    case 2 -> dm.addBuyer(1);
                     case 3 -> dm.addSeller();
-                    case 4 -> dm.removeBuyer();
+                    case 4 -> dm.removeBuyer(4);
                     case 5 -> dm.removeSeller();
                     case 6 -> {
                         System.out.println("Quitting");
@@ -45,12 +46,14 @@ public class BusSimApplication {
 
     private void choices() {
         String[] choiceLines = {
-            "1. Show sales", 
+        	"",
+            "1. Show data", 
             "2. Add a new buyer", 
             "3. Add a new seller", 
             "4. Remove buyer", 
             "5. Remove seller", 
-            "6. Quit"
+            "6. Quit",
+            ""
         };
         
         for (String choice : choiceLines) {

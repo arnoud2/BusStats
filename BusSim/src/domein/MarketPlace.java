@@ -1,8 +1,9 @@
 package domein;
 
+import java.security.SecureRandom;
+
 public class MarketPlace {
-	
-	public void makeBuyers() {
+	public void sales() {
 		
 	}
 }
