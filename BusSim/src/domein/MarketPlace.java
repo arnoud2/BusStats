@@ -1,4 +1,4 @@
-package cui;
+package domein;
 
 public class MarketPlace {
 	

@@ -7,20 +7,13 @@ public class DomeinController {
 	private final BuyerRepository buyerRepo;
 	private final SellerRepository sellerRepo;
 	
-	
 	public DomeinController() {
 		buyerRepo = new BuyerRepository();
 		sellerRepo = new SellerRepository();
 	}
 
-	public List<String> giveAllBuyers() {
+	public void showData() {
 		//TODO
-		return null;	
-	}
-	
-	public List<String> giveAllSellers() {
-		//TODO
-		return null;	
 	}
 	
 	public void addBuyer() {
@@ -31,13 +24,11 @@ public class DomeinController {
 		//TODO
 	}
 	
-	public int getAmountBuyers(){
-		return 0;
+	public void removeBuyer() {
 		//TODO
 	}
 	
-	public int getAmountSellers() {
-		return 0;
+	public void removeSeller() {
 		//TODO
 	}
 }
