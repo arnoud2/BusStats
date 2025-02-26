@@ -6,52 +6,72 @@ public class DomeinController {
 
     private final BuyerRepository buyerRepo;
     private final SellerRepository sellerRepo;
+    private final MarketPlace market;
 
     public DomeinController() {
         buyerRepo = new BuyerRepository();
         sellerRepo = new SellerRepository();
+        market = new MarketPlace();
     }
 
     public void showData() {
-    	buyerToString();
+        System.out.println("\n===== Market Data =====");
+        buyerToString();
         sellerToString();
     }
 
     public void addBuyer(int spendingRange) {
         int id = buyerRepo.addBuyer(spendingRange);
-        System.out.printf("Created buyer with id: %d and spending range of %d succsefuly!%n", id, spendingRange);
+        System.out.printf("✔ Created Buyer (ID: %d) | Spending Range: %d%n", id, spendingRange);
     }
 
-	public void addSeller() {
-		//TODO
-	}
-   
-	public void removeSeller() {
-		//TODO
-	}
-	
-    public void removeBuyer(int buyerId) {
-        boolean exists = buyerRepo.removeBuyer(buyerId);
-        if (exists)
-        	System.out.println("Removed User with id: " + buyerId);
+    public void addSeller(int productCount, int priceRange) {
+        int id = sellerRepo.addSeller(productCount, priceRange);
+        System.out.printf("✔ Created Seller (ID: %d) | Product Count: %d | Price Range: %d%n", id, productCount, priceRange);
+    }
+
+    public void removeSeller(int sellerId) {
+        if (sellerRepo.removeSeller(sellerId))
+            System.out.printf("✔ Removed Seller (ID: %d)%n", sellerId);
         else
-        	System.out.printf("Buyer with id: %d does not exist%n", buyerId);
+            System.out.printf("❌ Seller (ID: %d) does not exist%n", sellerId);
     }
-    
-    public void buyerToString() {    	
-    	List<Buyer> buyer = buyerRepo.getBuyers();
-    	System.out.println();
-    	for (Buyer b : buyer) {
-    		System.out.printf("-Buyer(%d) spendingRange: %d%n", b.getBuyerId(), b.getSpendingRange());
-    		}
-    	System.out.println();
+
+    public void removeBuyer(int buyerId) {
+        if (buyerRepo.removeBuyer(buyerId))
+            System.out.printf("✔ Removed Buyer (ID: %d)%n", buyerId);
+        else
+            System.out.printf("❌ Buyer (ID: %d) does not exist%n", buyerId);
     }
-    
+
+    public void buyerToString() {       
+        List<Buyer> buyers = buyerRepo.getBuyers();
+        System.out.println("\n--- Buyers ---");
+        if (buyers.isEmpty()) {
+            System.out.println("No buyers available.");
+        } else {
+            buyers.forEach(b -> System.out.printf("Buyer (ID: %d) | Spending Range: %d%n", b.getBuyerId(), b.getSpendingRange()));
+        }
+    }
+
     public void sellerToString() {
-    	List<Seller> seller = sellerRepo.getSellers();
-    	for (Seller s : seller) {
-    		System.out.printf("-Seller(%d) productCount: %d, priceRange: %d", s.getSellerId(), s.getProductCount(), s.getPriceRange());
-    		}
-    	System.out.println();
+        List<Seller> sellers = sellerRepo.getSellers();
+        System.out.println("\n--- Sellers ---");
+        if (sellers.isEmpty()) {
+            System.out.println("No sellers available.");
+        } else {
+            sellers.forEach(s -> System.out.printf("Seller (ID: %d) | Product Count: %d | Price Range: %d%n", s.getSellerId(), s.getProductCount(), s.getPriceRange()));
+        }
+    }
+
+    public void simulateMarket(int surplus) {
+        System.out.println("\n --- Starting Market Simulation --- \n");
+        List<Buyer> buyers = buyerRepo.getBuyers();
+        List<Seller> sellers = sellerRepo.getSellers();
+
+        market.timeToBuySomething(sellers, buyers, surplus);
+
+        System.out.println("\n --- Market Simulation Completed --- ");
+        showData();
     }
 }
