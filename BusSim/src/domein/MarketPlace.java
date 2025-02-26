@@ -4,70 +4,71 @@ import java.security.SecureRandom;
 import java.util.*;
 
 public class MarketPlace {
-    
-    private SecureRandom random;
+
+    private final SecureRandom random;
 
     public MarketPlace() {
         this.random = new SecureRandom();
     }
 
     public void timeToBuySomething(List<Seller> sellers, List<Buyer> buyers, int surplus) {
-        boolean[] buyerBought = new boolean[buyers.size()];
-        boolean[] sellerSold = new boolean[sellers.size()];
-
-        Map<Integer, Integer> initialProductCounts = new HashMap<>();
-        for (Seller seller : sellers) {
-            initialProductCounts.put(seller.getSellerId(), seller.getProductCount());
+        if (sellers == null || buyers == null || sellers.isEmpty() || buyers.isEmpty()) {
+            throw new IllegalArgumentException("Seller and Buyer lists cannot be null or empty.");
         }
+
+        Map<Buyer, Boolean> buyerBought = new HashMap<>();
+        Map<Seller, Boolean> sellerSold = new HashMap<>();
+
+        for (Buyer buyer : buyers) buyerBought.put(buyer, false);
+        for (Seller seller : sellers) sellerSold.put(seller, false);
+
         List<Buyer> shuffledBuyers = new ArrayList<>(buyers);
         Collections.shuffle(shuffledBuyers, random);
 
-        for (int i = 0; i < shuffledBuyers.size(); i++) {
-            Buyer buyer = shuffledBuyers.get(i);
+        for (Buyer buyer : shuffledBuyers) {
             List<Seller> shuffledSellers = new ArrayList<>(sellers);
             Collections.shuffle(shuffledSellers, random);
-            
+
             for (Seller seller : shuffledSellers) {
-                if (sale$$$(buyer, seller, surplus)) {
-                    buyerBought[buyers.indexOf(buyer)] = true;
-                    sellerSold[sellers.indexOf(seller)] = true;
+                if (processSale(buyer, seller, surplus)) {
+                    buyerBought.put(buyer, true);
+                    sellerSold.put(seller, true);
                     break;
                 }
             }
         }
 
-        noTransactions(sellers, buyers, buyerBought, sellerSold);
-        for (Seller seller : sellers) {
-            seller.setProductCount(initialProductCounts.get(seller.getSellerId()));
-        }
+        adjustPrices(sellers, buyers, buyerBought, sellerSold);
     }
 
-    private boolean sale$$$(Buyer buyer, Seller seller, int surplus) {
-        if (buyer.getSpendingRange() >= seller.getPriceRange() - surplus &&
-            buyer.getSpendingRange() <= seller.getPriceRange() + surplus &&
-            seller.getProductCount() > 0) {
+    private boolean processSale(Buyer buyer, Seller seller, int surplus) {
+        if (buyer == null || seller == null) return false;
 
-            int theSalePrice = (seller.getPriceRange() + buyer.getSpendingRange()) / 2;
+        int buyerSpending = buyer.getSpendingRange();
+        int sellerPrice = seller.getPriceRange();
+
+        if (buyerSpending >= sellerPrice - surplus && buyerSpending <= sellerPrice + surplus && seller.getProductCount() > 0) {
+            int salePrice = (sellerPrice + buyerSpending) / 2;
 
             seller.setProductCount(seller.getProductCount() - 1);
-            seller.setPriceRange(theSalePrice);
-            buyer.setSpendingRange(theSalePrice);
+            seller.setPriceRange((int) (seller.getPriceRange() * (1 - 0.1) + salePrice * 0.1));
+            buyer.setSpendingRange((int) (buyer.getSpendingRange() * (1 - 0.1) + salePrice * 0.1));
 
             return true;
         }
         return false;
     }
 
-    private void noTransactions(List<Seller> sellers, List<Buyer> buyers, 
-                                boolean[] buyerBought, boolean[] sellerSold) {
-        for (int i = 0; i < buyers.size(); i++) {
-            if (!buyerBought[i]) {
-                buyers.get(i).setSpendingRange((int) (buyers.get(i).getSpendingRange() * 0.9));
+    private void adjustPrices(List<Seller> sellers, List<Buyer> buyers, 
+                              Map<Buyer, Boolean> buyerBought, Map<Seller, Boolean> sellerSold) {
+        for (Buyer buyer : buyers) {
+            if (!buyerBought.get(buyer)) {
+                buyer.setSpendingRange((int) (buyer.getSpendingRange() * 0.9));
             }
         }
-        for (int i = 0; i < sellers.size(); i++) {
-            if (!sellerSold[i]) {
-                sellers.get(i).setPriceRange((int) (sellers.get(i).getPriceRange() * 0.9));
+        for (Seller seller : sellers) {
+            if (!sellerSold.get(seller)) {
+                seller.setPriceRange((int) (seller.getPriceRange() * 0.9));
             }
         }
     }

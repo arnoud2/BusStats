@@ -65,13 +65,10 @@ public class DomeinController {
     }
 
     public void simulateMarket(int surplus) {
-        System.out.println("\n --- Starting Market Simulation --- \n");
         List<Buyer> buyers = buyerRepo.getBuyers();
         List<Seller> sellers = sellerRepo.getSellers();
 
         market.timeToBuySomething(sellers, buyers, surplus);
 
-        System.out.println("\n --- Market Simulation Completed --- ");
-        showData();
     }
 }
